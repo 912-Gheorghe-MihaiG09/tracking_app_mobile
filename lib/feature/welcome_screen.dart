@@ -14,6 +14,7 @@ class WelcomeScreen extends StatelessWidget {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _normalButtonSection(context),
           ],
@@ -23,46 +24,43 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _normalButtonSection(BuildContext context) {
-    return Expanded(
-      flex: 1,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: CustomElevatedButton(
-                text: "Register New Account",
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const RegistrationScreen(),
-                  ));
-                },
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: CustomElevatedButton(
+              text: "Register New Account",
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const RegistrationScreen(),
+                ));
+              },
             ),
-            RichText(
-              text: TextSpan(
-                style: Theme.of(context).textTheme.bodyMedium,
-                children: <TextSpan>[
-                  const TextSpan(
-                    text: "Already have an account?",
-                  ),
-                  TextSpan(
-                    text: " Login!",
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: AppColors.primary,
-                        ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                      },
-                  ),
-                ],
-              ),
+          ),
+          RichText(
+            text: TextSpan(
+              style: Theme.of(context).textTheme.bodyMedium,
+              children: <TextSpan>[
+                const TextSpan(
+                  text: "Already have an account?",
+                ),
+                TextSpan(
+                  text: " Login!",
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: AppColors.primary,
+                      ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginScreen()));
+                    },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

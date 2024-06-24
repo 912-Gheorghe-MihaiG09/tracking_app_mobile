@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:tracking_app/common/widgets/dialogs.dart';
+import 'package:tracking_app/data/domain/device/device.dart';
 import 'package:tracking_app/feature/connectivity/bloc/device_connectivity_bloc.dart';
-import 'package:tracking_app/feature/connectivity/screens/device_naming_screen.dart';
+import 'package:tracking_app/feature/manage_device/update_device_screen.dart';
 
 class QRScanner extends StatefulWidget {
   const QRScanner({super.key});
@@ -79,16 +80,13 @@ class _QRScannerState extends State<QRScanner> {
     });
   }
 
-  void _navigateToNamingScreen(BuildContext context) {
+  void _navigateToNamingScreen(BuildContext context, Device device) {
     _controller?.pauseCamera();
     Navigator.push(
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (_, __, ___) => BlocProvider.value(
-          value: BlocProvider.of<DeviceConnectivityBloc>(context),
-          child: const DeviceNamingScreen(),
-        ),
+        pageBuilder: (_, __, ___) => UpdateDeviceScreen(device: device),
         transitionsBuilder: (_, animation, __, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
@@ -125,7 +123,7 @@ class _QRScannerState extends State<QRScanner> {
           _showDialog("Ooops", "Something went wrong, please try again later");
       }
     } else if (state is DeviceConnectivitySuccess) {
-      _navigateToNamingScreen(context);
+      _navigateToNamingScreen(context, state.device);
     }
   }
 

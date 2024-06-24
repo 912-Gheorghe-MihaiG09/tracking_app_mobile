@@ -4,10 +4,12 @@ class _DetailsMap extends StatefulWidget {
   final LatLng initialPosition;
   final List<LatLng> markerLocations;
   final String markerPath;
+  final Device device;
 
   const _DetailsMap(
       {required this.initialPosition,
       required this.markerLocations,
+      required this.device,
       required this.markerPath});
 
   @override
@@ -24,27 +26,76 @@ class _DetailsMapState extends State<_DetailsMap> {
 
   final List<Marker> _markersList = [];
 
+  final List<Circle> _circleList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _setupCircle();
+  }
+
+  void _setupCircle() {
+    _circleList.clear();
+    if (widget.device.isLocked) {
+      if (widget.device.geofence != null) {
+        _circleList.add(
+          Circle(
+            circleId: const CircleId("Lock circle"),
+            center: LatLng(widget.device.geofence!.latitude,
+                widget.device.geofence!.longitude),
+            radius: widget.device.geofence!.radius.toDouble(),
+            fillColor: AppColors.secondary.withOpacity(0.5),
+            strokeWidth: 1,
+            strokeColor: AppColors.secondary,
+          ),
+        );
+      }
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      initialCameraPosition:
-          CameraPosition(target: widget.initialPosition, zoom: 18),
-      onMapCreated: (controller) async {
-        _controller = controller;
-        rootBundle
-            .loadString('assets/map/map_style.json')
-            .then((value) => _controller?.setMapStyle(value));
-        if (mounted) {
-          await _initImages();
+    return BlocListener<DeviceDetailsBloc, DeviceDetailsState>(
+      listener: (context, state) {
+        if (state is LockState) {
+          _circleList.clear();
+          _circleList.add(
+            Circle(
+              circleId: const CircleId("Lock circle"),
+              center: widget.initialPosition,
+              radius: state.lockRadius.toDouble(),
+              fillColor: AppColors.secondary.withOpacity(0.5),
+              strokeWidth: 1,
+              strokeColor: AppColors.secondary,
+            ),
+          );
+          setState(() {});
+        } else {
+          _setupCircle();
         }
-
-        _setMarkers();
       },
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      markers: _markersList.toSet(),
-      zoomControlsEnabled: false,
-      mapToolbarEnabled: false,
+      child: GoogleMap(
+        initialCameraPosition:
+            CameraPosition(target: widget.initialPosition, zoom: 18),
+        onMapCreated: (controller) async {
+          _controller = controller;
+          rootBundle
+              .loadString('assets/map/map_style.json')
+              .then((value) => _controller?.setMapStyle(value));
+          if (mounted) {
+            await _initImages();
+          }
+
+          _setMarkers();
+        },
+        circles: _circleList.toSet(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
+        markers: _markersList.toSet(),
+        zoomControlsEnabled: false,
+        mapToolbarEnabled: false,
+      ),
     );
   }
 

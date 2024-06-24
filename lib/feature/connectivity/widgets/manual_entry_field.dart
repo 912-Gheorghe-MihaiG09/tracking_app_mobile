@@ -4,7 +4,7 @@ import 'package:pinput/pinput.dart';
 import 'package:tracking_app/common/theme/colors.dart';
 import 'package:tracking_app/common/widgets/text_input_field.dart';
 import 'package:tracking_app/feature/connectivity/bloc/device_connectivity_bloc.dart';
-import 'package:tracking_app/feature/connectivity/screens/device_naming_screen.dart';
+import 'package:tracking_app/feature/manage_device/update_device_screen.dart';
 
 class ManualEntryField extends StatefulWidget {
   final String? secondaryButtonText;
@@ -49,22 +49,24 @@ class _ManualEntryFieldState extends State<ManualEntryField> {
                   Material(
                     color: AppColors.transparent,
                     child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: TextInputField(
-                      labelText: "Device Serial Number",
-                      characterLimit: 17,
-                      hintText: "000-0000000-00000",
-                      keyboardType: keyboardType,
-                      textInputAction: TextInputAction.done,
-                      autoValidateMode: AutovalidateMode.always,
-                      textCapitalization: TextCapitalization.characters,
-                      validator: (s) => _validateBatterySerialNumber(s, state),
-                      controller: _serialNumberController,
-                      onChanged: (value) => setState(() {
-                        _textChangeHandler(value);
-                      }),
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: TextInputField(
+                        labelText: "Device Serial Number",
+                        characterLimit: 17,
+                        hintText: "000-0000000-00000",
+                        keyboardType: keyboardType,
+                        textInputAction: TextInputAction.done,
+                        autoValidateMode: AutovalidateMode.always,
+                        textCapitalization: TextCapitalization.characters,
+                        validator: (s) =>
+                            _validateBatterySerialNumber(s, state),
+                        controller: _serialNumberController,
+                        onChanged: (value) => setState(() {
+                          _textChangeHandler(value);
+                        }),
+                      ),
                     ),
-                  ),),
+                  ),
                   Column(children: [
                     ElevatedButton(
                       onPressed: _isButtonEnabled
@@ -97,10 +99,7 @@ class _ManualEntryFieldState extends State<ManualEntryField> {
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 500),
-          pageBuilder: (_, __, ___) => BlocProvider.value(
-            value: BlocProvider.of<DeviceConnectivityBloc>(context),
-            child: const DeviceNamingScreen(),
-          ),
+          pageBuilder: (_, __, ___) => UpdateDeviceScreen(device: state.device),
           transitionsBuilder: (_, animation, __, child) {
             const begin = Offset(1.0, 0.0);
             const end = Offset.zero;

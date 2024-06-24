@@ -38,11 +38,8 @@ class _DeviceTileState extends State<DeviceTile> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DeviceDetailsScreen(device: widget.device),
-          ),
-        );
+        Navigator.of(context)
+            .push(DeviceDetailsScreen.route(context, widget.device));
       },
       child: Container(
         decoration: const BoxDecoration(
@@ -84,7 +81,7 @@ class _DeviceTileState extends State<DeviceTile> {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  "last update: ${widget.device.location.time}",
+                  "last update: ${widget.device.location.date}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)

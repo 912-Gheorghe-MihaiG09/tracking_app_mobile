@@ -7,7 +7,7 @@ sealed class DeviceConnectivityEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class PairDevice extends DeviceConnectivityEvent{
+class PairDevice extends DeviceConnectivityEvent {
   final String serialNumber;
 
   const PairDevice(this.serialNumber);
@@ -16,18 +16,7 @@ class PairDevice extends DeviceConnectivityEvent{
   List<Object?> get props => [serialNumber];
 }
 
-class UpdateDevice extends DeviceConnectivityEvent{
-  final String deviceName;
-  final DeviceCategory deviceCategory;
-
-  const UpdateDevice(this.deviceName, this.deviceCategory);
-
-  @override
-  List<Object?> get props => [deviceName];
-}
-
-
-class ResetToInitial extends DeviceConnectivityEvent{
+class ResetToInitial extends DeviceConnectivityEvent {
   const ResetToInitial();
 
   @override

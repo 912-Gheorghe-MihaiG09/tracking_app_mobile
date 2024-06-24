@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tracking_app/data/domain/device/device.dart';
 import 'package:tracking_app/data/domain/device/device_categories.dart';
 
-abstract class DeviceRepository {
+abstract class DeviceDataSource {
   FutureOr<Device?> addDevice(String serialNumber);
 
   FutureOr<List<Device>> getDevices();

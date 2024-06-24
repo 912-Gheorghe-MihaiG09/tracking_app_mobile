@@ -6,7 +6,6 @@ import 'package:tracking_app/data/service/exceptions/network_exception.dart'
     as network;
 
 abstract class ApiService {
-  final String discountCodeUrl = "/api/discount";
   final String baseUrl;
   final Dio dio;
   final AuthInterceptor? _authInterceptor;
@@ -21,7 +20,7 @@ abstract class ApiService {
     dio.options.receiveTimeout = const Duration(seconds: 60);
     dio.interceptors.clear();
     if (_authInterceptor != null) {
-      dio.interceptors.add(_authInterceptor!);
+      dio.interceptors.add(_authInterceptor);
     }
     dio.interceptors.addAll([
       InterceptorsWrapper(onError: errorHandler),

@@ -1,24 +1,25 @@
 import 'dart:async';
 
-import 'package:tracking_app/data/data_source/device/device_data_source.dart';
+import 'package:google_maps_flutter_platform_interface/src/types/location.dart';
+import 'package:tracking_app/data/repository/device/data_source/device_data_source.dart';
 import 'package:tracking_app/data/domain/device/device.dart';
 import 'package:tracking_app/data/domain/device/device_categories.dart';
 
-class DeviceDataSourceLocal extends DeviceDataSource{
+class DeviceDataSourceLocal extends DeviceDataSource {
   List<Map<String, dynamic>> data = _DeviceInitialInMemoryData.data;
 
-  List<int> userDevices = [0];
+  List<int> userDevices = [0, 1, 2, 3];
 
   @override
   FutureOr<Device?> addDevice(String serialNumber) {
-    for(int index in userDevices){
-      if(data[index]["serialNumber"] == serialNumber){
+    for (int index in userDevices) {
+      if (data[index]["serialNumber"] == serialNumber) {
         return Device.fromJson(data[index]);
       }
     }
 
-    for(Map<String, dynamic> deviceJson in data){
-      if(deviceJson["serialNumber"] == serialNumber){
+    for (Map<String, dynamic> deviceJson in data) {
+      if (deviceJson["serialNumber"] == serialNumber) {
         userDevices.add(data.indexOf(deviceJson));
         return Device.fromJson(deviceJson);
       }
@@ -29,8 +30,8 @@ class DeviceDataSourceLocal extends DeviceDataSource{
   @override
   FutureOr<List<Device>> getDevices() {
     List<Map<String, dynamic>> userData = [];
-    for(int index = 0; index < data.length; index ++){
-      if(userDevices.contains(index)){
+    for (int index = 0; index < data.length; index++) {
+      if (userDevices.contains(index)) {
         userData.add(data[index]);
       }
     }
@@ -38,23 +39,41 @@ class DeviceDataSourceLocal extends DeviceDataSource{
   }
 
   @override
-  FutureOr<void> removeDevice(String serialNumber){
-    for(int index in userDevices){
-      if(data[index]["serialNumber"] == serialNumber){
+  FutureOr<void> removeDevice(String serialNumber) {
+    for (int index in userDevices) {
+      if (data[index]["serialNumber"] == serialNumber) {
         userDevices.remove(index);
       }
     }
   }
 
   @override
-  FutureOr<Device?> updateDevice(String serialNumber, String deviceName, DeviceCategory category) {
-    for(int index in userDevices){
-      if(data[index]["serialNumber"] == serialNumber){
+  FutureOr<Device?> updateDevice(
+      String serialNumber, String deviceName, DeviceCategory category) {
+    for (int index in userDevices) {
+      if (data[index]["serialNumber"] == serialNumber) {
         data[index]["deviceName"] = deviceName;
         data[index]["deviceCategory"] = category.name;
         return Device.fromJson(data[index]);
       }
     }
+    return null;
+  }
+
+  // TODO: implement if necessary
+  @override
+  FutureOr<Device?> lockDevice(
+      String serialNumber, LatLng location, int radius) {
+    return null;
+  }
+
+  @override
+  FutureOr<Device?> unlockDevice(String serialNumber) {
+    return null;
+  }
+
+  @override
+  FutureOr<void> pingDevice(String serialNumber) {
     return null;
   }
 }
@@ -63,7 +82,7 @@ class _DeviceInitialInMemoryData {
   static List<Map<String, dynamic>> data = [
     {
       "serialNumber": "SN1-0000000-00001",
-      "deviceName": "Device 1",
+      "deviceName": "Rex",
       "location": {
         "latitude": 46.7749,
         "longitude": 23.5863,
@@ -71,11 +90,11 @@ class _DeviceInitialInMemoryData {
       },
       "locationHistory": [],
       "zoneBoundaries": null,
-      "deviceCategory": "OTHER"
+      "deviceCategory": "PETS"
     },
     {
       "serialNumber": "SN1-0000000-00002",
-      "deviceName": "Device 2",
+      "deviceName": "Son's Bike",
       "location": {
         "latitude": 46.7699,
         "longitude": 23.5888,
@@ -83,11 +102,11 @@ class _DeviceInitialInMemoryData {
       },
       "locationHistory": [],
       "zoneBoundaries": null,
-      "deviceCategory": "OTHER"
+      "deviceCategory": "BIKE"
     },
     {
       "serialNumber": "SN1-0000000-00003",
-      "deviceName": "Device 3",
+      "deviceName": "Work Bag",
       "location": {
         "latitude": 46.7792,
         "longitude": 23.5837,
@@ -95,20 +114,19 @@ class _DeviceInitialInMemoryData {
       },
       "locationHistory": [],
       "zoneBoundaries": null,
-      "deviceCategory": "OTHER"
+      "deviceCategory": "BACKPACK"
     },
     {
       "serialNumber": "SN1-0000000-00004",
-      "deviceName": "Device 4",
+      "deviceName": "Wife SUV",
       "location": {
         "latitude": 46.7715,
         "longitude": 23.5913,
         "time": "2024-03-23T15:58:00+01:00"
-
       },
       "locationHistory": [],
       "zoneBoundaries": null,
-      "deviceCategory": "OTHER"
+      "deviceCategory": "CAR"
     }
   ];
 }

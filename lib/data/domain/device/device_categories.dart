@@ -1,3 +1,8 @@
+import 'dart:typed_data';
+
+import 'package:flutter/cupertino.dart';
+import 'package:tracking_app/common/utils/marker_builder.dart';
+
 abstract class DeviceCategory {
   String get iconPath;
   String get name;
@@ -14,6 +19,31 @@ abstract class DeviceCategory {
     if (deviceCategory == "UMBRELLA") return UmbrellaCategory();
     if (deviceCategory == "OTHER") return OtherCategory();
     return OtherCategory();
+  }
+
+  static Future<Map<String, Uint8List>> categoryMarkers(
+      BuildContext context) async {
+    int iconSize = MediaQuery.of(context).devicePixelRatio.round() * 30;
+    return {
+      "BIKE": await MarkerBuilder.getImage(
+          "assets/images/category_icons/bike.png", iconSize),
+      "CAR": await MarkerBuilder.getImage(
+          "assets/images/category_icons/car.png", iconSize),
+      "BACKPACK": await MarkerBuilder.getImage(
+          "assets/images/category_icons/backpack.png", iconSize),
+      "HEADPHONES": await MarkerBuilder.getImage(
+          "assets/images/category_icons/headphones.png", iconSize),
+      "MOTORBIKE": await MarkerBuilder.getImage(
+          "assets/images/category_icons/motorbike.png", iconSize),
+      "PETS": await MarkerBuilder.getImage(
+          "assets/images/category_icons/pets.png", iconSize),
+      "SUITCASE": await MarkerBuilder.getImage(
+          "assets/images/category_icons/suitcase.png", iconSize),
+      "UMBRELLA": await MarkerBuilder.getImage(
+          "assets/images/category_icons/umbrella.png", iconSize),
+      "OTHER": await MarkerBuilder.getImage(
+          "assets/images/category_icons/other.png", iconSize),
+    };
   }
 }
 

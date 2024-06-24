@@ -18,7 +18,6 @@ class DeviceConnectivityBloc
   DeviceConnectivityBloc(this._deviceRepository)
       : super(const DeviceConnectivityInitial()) {
     on<PairDevice>(_onPairDevice);
-    on<UpdateDevice>(_onUpdateDevice);
     on<ResetToInitial>(_onResetToInitial);
   }
 
@@ -35,30 +34,6 @@ class DeviceConnectivityBloc
       serialNumber = event.serialNumber;
       emit(DeviceConnectivitySuccess(device));
     } catch (e) {
-      emit(
-        const DeviceConnectivityError(DeviceConnectivityErrorReason.unknown),
-      );
-    }
-  }
-
-  FutureOr<void> _onUpdateDevice(
-      UpdateDevice event, Emitter<DeviceConnectivityState> emit) async {
-    emit(const DeviceConnectivityLoading());
-    if (serialNumber != null) {
-      try {
-        Device? device = await _deviceRepository.updateDevice(
-            serialNumber!, event.deviceName, event.deviceCategory);
-        if (device == null) {
-          emit(const DeviceConnectivityError(
-              DeviceConnectivityErrorReason.doesNotExist));
-        }
-        emit(const DeviceConnectivityUpdateSuccess());
-      } catch (e) {
-        emit(
-          const DeviceConnectivityError(DeviceConnectivityErrorReason.unknown),
-        );
-      }
-    } else {
       emit(
         const DeviceConnectivityError(DeviceConnectivityErrorReason.unknown),
       );

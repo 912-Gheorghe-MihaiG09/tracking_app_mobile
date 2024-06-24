@@ -148,9 +148,7 @@ class NativeDialog {
         const Center(
           child: Padding(
             padding: EdgeInsets.all(16.0),
-            child: CircularProgressIndicator(
-
-            ),
+            child: CircularProgressIndicator(),
           ),
         ),
       );
@@ -190,11 +188,12 @@ class NativeDialog {
 }
 
 class GenericDialogs {
-
-  static NativeDialog somethingWentWrong() => NativeDialog(
-      title: "Oops",
-      firstButtonText: "Ok",
-      content: "Something went wrong, please try again!");
+  static NativeDialog somethingWentWrong({void Function()? onButtonPress}) =>
+      NativeDialog(
+          title: "Oops",
+          firstButtonText: "Ok",
+          onFirstButtonPress: onButtonPress,
+          content: "Something went wrong, please try again!");
 
   static NativeDialog networkError() => NativeDialog(
         title: "No internet Connection",

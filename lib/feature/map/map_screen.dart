@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tracking_app/common/theme/colors.dart';
 import 'package:tracking_app/data/domain/device/device.dart';
+import 'package:tracking_app/data/domain/device/device_categories.dart';
 import 'package:tracking_app/feature/home/bloc/device_list_bloc.dart';
 import 'package:tracking_app/feature/home/device_tile.dart';
 
@@ -24,15 +25,17 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
 
   final List<Marker> _markersList = [];
 
+  final List<Circle> _circleList = [];
+
   final CarouselController _carouselController = CarouselController();
 
-  Uint8List? _markerIcon;
-
-  Uint8List? _selectedMarkerIcon;
+  late Map<String, Uint8List> _categoryMarkers;
 
   int _currentSelected = 0;
 
   CameraPosition? _initialCameraPosition;
+
+  List<Device> devices = [];
 
   @override
   void initState() {
@@ -48,7 +51,6 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   Widget _buildMapLayout() {
     return BlocBuilder<DeviceListBloc, DeviceListState>(
         builder: (context, state) {
-      List<Device> devices = [];
       if (state is DeviceListLoaded) {
         devices = state.devices;
 
@@ -81,6 +83,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
             markers: _markersList.toSet(),
             zoomControlsEnabled: false,
             mapToolbarEnabled: false,
+            circles: _circleList.toSet(),
           ),
           Column(
             children: [
@@ -158,7 +161,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
                     itemBuilder: (context, index, realIndex) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 0,
+                          horizontal: 8,
                         ),
                         child: DeviceTile(
                           device: devices[index],
@@ -177,29 +180,45 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
 
   void _setMarkers(List<Device> devices) {
     _markersList.clear();
-    if (_selectedMarkerIcon == null || _markerIcon == null || devices.isEmpty) {
-      return;
-    }
     for (int index = 0; index < devices.length; index++) {
       _markersList.add(
         Marker(
             markerId: MarkerId(
                 devices[index].deviceName ?? devices[index].serialNumber),
-            icon: (index != _currentSelected)
-                ? BitmapDescriptor.fromBytes(_markerIcon!)
-                : BitmapDescriptor.fromBytes(_selectedMarkerIcon!),
+            icon: BitmapDescriptor.fromBytes(
+                _categoryMarkers[devices[index].deviceCategory.name]!),
             position: devices[index].location.location,
             onTap: () {
               _onMarkerTap(index);
             }),
       );
     }
+    setupCircle(devices[_currentSelected]);
     _controller?.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
             target: devices[_currentSelected].location.location, zoom: 17),
       ),
     );
+  }
+
+  void setupCircle(Device device) {
+    _circleList.clear();
+    if (device.isLocked) {
+      if (device.geofence != null) {
+        _circleList.add(
+          Circle(
+            circleId: const CircleId("Lock circle"),
+            center:
+                LatLng(device.geofence!.latitude, device.geofence!.longitude),
+            radius: device.geofence!.radius.toDouble(),
+            fillColor: AppColors.secondary.withOpacity(0.5),
+            strokeWidth: 1,
+            strokeColor: AppColors.secondary,
+          ),
+        );
+      }
+    }
   }
 
   Widget _fleetSize(int size) {
@@ -229,18 +248,11 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   }
 
   void _changeSelected(int index) {
-    if (_selectedMarkerIcon == null || _markerIcon == null) {
-      return;
-    }
-    _markersList[index] = _markersList[index]
-        .copyWith(iconParam: BitmapDescriptor.fromBytes(_selectedMarkerIcon!));
-    _markersList[_currentSelected] = _markersList[_currentSelected]
-        .copyWith(iconParam: BitmapDescriptor.fromBytes(_markerIcon!));
     setState(() {
       _currentSelected = index;
+      setupCircle(devices[_currentSelected]);
     });
   }
-
 
   Future<void> _onMapCreated(GoogleMapController controller,
       DeviceListState state, List<Device> devices) async {
@@ -249,7 +261,7 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         .loadString('assets/map/map_style.json')
         .then((value) => _controller?.setMapStyle(value));
     if (mounted) {
-      await _initImages();
+      _categoryMarkers = await DeviceCategory.categoryMarkers(context);
     }
     if (state is DeviceListLoaded) {
       _setMarkers(devices);
@@ -257,27 +269,6 @@ class MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
         setState(() {});
       }
     }
-  }
-
-  static Future<Uint8List> _getImage(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetHeight: width);
-
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-  }
-
-  Future<void> _initImages() async {
-    // marker size must be dependent on screen size
-    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
-    _markerIcon = await _getImage(
-        "assets/images/map_marker_unselected.png", pixelRatio.round() * 40);
-    _selectedMarkerIcon = await _getImage(
-        "assets/images/map_marker_selected.png", pixelRatio.round() * 60);
   }
 
   Widget _currentPositionButton() {
