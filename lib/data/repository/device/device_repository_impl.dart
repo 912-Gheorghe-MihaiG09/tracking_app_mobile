@@ -47,4 +47,9 @@ class DeviceRepositoryImpl extends DeviceRepository {
   FutureOr<void> pingDevice(String serialNumber) {
     return _deviceDataSource.pingDevice(serialNumber);
   }
+
+  @override
+  Future<Stream?> notificationStream() {
+    return _deviceDataSource.notificationStream();
+  }
 }

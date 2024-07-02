@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tracking_app/data/domain/device/device.dart';
 import 'package:tracking_app/data/domain/device/device_categories.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'api_service.dart';
 
@@ -74,5 +75,15 @@ class DeviceService extends ApiService {
     var response = await dio.post("$_baseUserUrl/device/ping/$serialNumber");
 
     return;
+  }
+
+  Future<Stream<dynamic>> connectToDeviceWS() async {
+    final channel = WebSocketChannel.connect(
+      Uri.parse('ws://${baseUrl.substring(7)}/websocketPath'),
+    );
+
+    await channel.ready;
+
+    return channel.stream;
   }
 }

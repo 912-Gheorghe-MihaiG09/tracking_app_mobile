@@ -22,10 +22,19 @@ class _DeviceDetailsSheetState extends State<_DeviceDetailsSheet> {
         .then(
       (value) {
         setState(() {
-          deviceAddress = (value.first.street ?? "unknown") +
-              (value.first.postalCode != null
-                  ? ", ${value.first.postalCode}"
-                  : "");
+          Placemark bestAddress = value.first;
+          for (var address in value) {
+            if (address.name != null) {
+              if (bestAddress.name == null ||
+                  (address.name!.length > bestAddress.name!.length)) {
+                bestAddress = address;
+              }
+            }
+          }
+          deviceAddress = (bestAddress.name == null || bestAddress.name!.isEmpty
+                  ? "unknown"
+                  : value.first.name!) +
+              (bestAddress.locality != null ? ", ${bestAddress.locality}" : "");
         });
       },
     );

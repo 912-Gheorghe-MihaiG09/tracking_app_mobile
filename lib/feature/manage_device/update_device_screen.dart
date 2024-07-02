@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,74 +81,85 @@ class _UpdateDeviceScreenState extends State<UpdateDeviceScreen> {
                 body: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _buildTextSection(),
-                          TextInputField(
-                            labelText: "Device Name",
-                            hintText: "Ex: Device EDZ 01",
-                            enableSpaceKey: true,
-                            autoValidateMode: AutovalidateMode.always,
-                            textCapitalization: TextCapitalization.sentences,
-                            characterLimit: 20,
-                            type: TextInputFieldType.clear,
-                            controller: _deviceNameController,
-                            onChanged: (_) => setState(
-                              () {
-                                _isButtonEnabled = Validator.validateDeviceName(
-                                        _deviceNameController.text) ==
-                                    null;
-                              },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                _buildTextSection(),
+                                TextInputField(
+                                  labelText: "Device Name",
+                                  hintText: "Ex: Device EDZ 01",
+                                  enableSpaceKey: true,
+                                  autoValidateMode: AutovalidateMode.always,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  characterLimit: 20,
+                                  type: TextInputFieldType.clear,
+                                  controller: _deviceNameController,
+                                  onChanged: (_) => setState(
+                                    () {
+                                      _isButtonEnabled =
+                                          Validator.validateDeviceName(
+                                                  _deviceNameController.text) ==
+                                              null;
+                                    },
+                                  ),
+                                  validator: (s) =>
+                                      Validator.validateDeviceName(s),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  child: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: _categoryList.map((e) {
+                                        return _CategoryDisplayBox(
+                                            e,
+                                            e.runtimeType ==
+                                                _selectedCategory.runtimeType,
+                                            () {
+                                          setState(() {
+                                            _selectedCategory = e;
+                                          });
+                                        });
+                                      }).toList()),
+                                ),
+                              ],
                             ),
-                            validator: (s) => Validator.validateDeviceName(s),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: _categoryList.map((e) {
-                                  return _CategoryDisplayBox(
-                                      e,
-                                      e.runtimeType ==
-                                          _selectedCategory.runtimeType, () {
-                                    setState(() {
-                                      _selectedCategory = e;
-                                    });
-                                  });
-                                }).toList()),
-                          ),
-                          CustomElevatedButton(
-                            text: "Done",
-                            onPressed: _isButtonEnabled
-                                ? () {
-                                    if (state is DeviceUpdateLoading ||
-                                        (_deviceListState != null &&
-                                            _deviceListState
-                                                is DeviceListLoading)) {
-                                      return;
-                                    }
-                                    bloc.add(
-                                      DeviceUpdate(
-                                          widget.device.serialNumber,
-                                          _deviceNameController.text,
-                                          _selectedCategory),
-                                    );
-                                  }
-                                : null,
-                            isLoading: state is DeviceConnectivityLoading ||
-                                (_deviceListState != null &&
-                                    _deviceListState is DeviceListLoading),
-                          )
-                        ],
-                      ),
+                        ),
+                        _buildButton(state),
+                      ],
                     ),
                   ),
                 ),
               );
             }),
       ),
+    );
+  }
+
+  Widget _buildButton(DeviceManagementState state) {
+    return CustomElevatedButton(
+      text: "Done",
+      onPressed: _isButtonEnabled
+          ? () {
+              if (state is DeviceUpdateLoading ||
+                  (_deviceListState != null &&
+                      _deviceListState is DeviceListLoading)) {
+                return;
+              }
+              bloc.add(
+                DeviceUpdate(widget.device.serialNumber,
+                    _deviceNameController.text, _selectedCategory),
+              );
+            }
+          : null,
+      isLoading: state is DeviceConnectivityLoading ||
+          (_deviceListState != null && _deviceListState is DeviceListLoading),
     );
   }
 
@@ -192,7 +204,8 @@ class _CategoryDisplayBox extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         padding: const EdgeInsets.all(16),
-        width: 110,
+        width: MediaQuery.of(context).size.width * 0.28,
+        height: 140,
         decoration: BoxDecoration(
           color: AppColors.tertiary,
           border: isSelected
@@ -211,11 +224,13 @@ class _CategoryDisplayBox extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 16),
-              child: Text(
-                deviceCategory.displayName,
-                style: Theme.of(context).textTheme.labelMedium,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: FittedBox(
+                child: Text(
+                  deviceCategory.displayName,
+                  style: Theme.of(context).textTheme.labelMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],

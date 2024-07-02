@@ -15,11 +15,23 @@ import 'package:tracking_app/data/service/interceptors/auth_interceptor.dart';
 import 'package:tracking_app/feature/auth/login/bloc/auth_bloc.dart';
 import 'package:tracking_app/feature/auth/register/bloc/registration_bloc.dart';
 import 'package:tracking_app/feature/home/bloc/device_list_bloc.dart';
+import 'package:tracking_app/feature/notification/bloc/notification_bloc.dart';
+import 'package:tracking_app/feature/notification/notification_service.dart';
 import 'package:tracking_app/feature/root_screen.dart';
 import 'package:tracking_app/feature/welcome_screen.dart';
+import 'package:tracking_app/feature/notification/notification_listener.dart'
+    as nl;
 
-void main() {
-  runApp(MyApp(appSettings: AppSettings(baseUrl: 'http://localhost:8080')));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService.instance.initNotification();
+
+  runApp(
+    MyApp(
+      appSettings: AppSettings(baseUrl: 'http://34.89.169.41:8080'),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -40,6 +52,8 @@ class MyApp extends StatelessWidget {
 
   late final _authService = AuthService(baseUrl: appSettings.baseUrl);
 
+  late final DeviceListBloc _deviceListBloc = DeviceListBloc(_deviceRepository);
+
   late final AuthRepository _authRepository =
       AuthRepository(SecureLocalStorage(), _authService);
 
@@ -54,19 +68,20 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => RegistrationBloc(_authRepository)),
+          BlocProvider(create: (_) => AuthBloc(_authRepository)),
           BlocProvider(
-            create: (_) => AuthBloc(_authRepository)
-              ..add(
-                const LogIn(email: "admin@mail.com", password: "Parola@123"),
-              ),
-          ),
-          BlocProvider(
-            create: (_) =>
-                DeviceListBloc(_deviceRepository)..add(const FetchDevices()),
+            create: (_) => _deviceListBloc..add(const FetchDevices()),
           ),
           BlocProvider(
             lazy: false,
             create: (_) => NetworkBloc()..add(NetworkObserve()),
+          ),
+          BlocProvider(
+            create: (_) => NotificationBloc(
+              _deviceRepository,
+              _deviceListBloc,
+            ),
+            lazy: false,
           ),
         ],
         child: MaterialApp(
@@ -75,7 +90,9 @@ class MyApp extends StatelessWidget {
           home: BlocConsumer<AuthBloc, AuthState>(
               builder: (context, state) {
                 if (state is Authenticated) {
-                  return const RootScreen();
+                  return const nl.NotificationListener(
+                    child: RootScreen(),
+                  );
                 } else {
                   return const WelcomeScreen();
                 }

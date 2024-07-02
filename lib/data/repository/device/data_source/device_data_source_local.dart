@@ -60,7 +60,6 @@ class DeviceDataSourceLocal extends DeviceDataSource {
     return null;
   }
 
-  // TODO: implement if necessary
   @override
   FutureOr<Device?> lockDevice(
       String serialNumber, LatLng location, int radius) {
@@ -74,6 +73,11 @@ class DeviceDataSourceLocal extends DeviceDataSource {
 
   @override
   FutureOr<void> pingDevice(String serialNumber) {
+    return null;
+  }
+
+  @override
+  Future<Stream?> notificationStream() async {
     return null;
   }
 }

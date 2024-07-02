@@ -24,6 +24,10 @@ final class DeviceListLoaded extends DeviceListState {
   List<Object> get props => [devices];
 }
 
+final class DeviceListRefreshing extends DeviceListLoaded {
+  const DeviceListRefreshing({required super.devices});
+}
+
 final class DeviceListError extends DeviceListState {
   const DeviceListError();
 }

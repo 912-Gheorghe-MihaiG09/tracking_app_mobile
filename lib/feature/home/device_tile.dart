@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:tracking_app/common/theme/colors.dart';
+import 'package:tracking_app/common/utils/string_formatter.dart';
 import 'package:tracking_app/data/domain/device/device.dart';
 import 'package:tracking_app/feature/details/device_details_screen.dart';
 
@@ -25,10 +26,19 @@ class _DeviceTileState extends State<DeviceTile> {
         .then(
       (value) {
         setState(() {
-          deviceAddress = (value.first.street ?? "unknown") +
-              (value.first.postalCode != null
-                  ? ", ${value.first.postalCode}"
-                  : "");
+          Placemark bestAddress = value.first;
+          for (var address in value) {
+            if (address.name != null) {
+              if (bestAddress.name == null ||
+                  (address.name!.length > bestAddress.name!.length)) {
+                bestAddress = address;
+              }
+            }
+          }
+          deviceAddress = (bestAddress.name == null || bestAddress.name!.isEmpty
+                  ? "unknown"
+                  : bestAddress.name!) +
+              (bestAddress.locality != null ? ", ${bestAddress.locality}" : "");
         });
       },
     );
@@ -81,7 +91,7 @@ class _DeviceTileState extends State<DeviceTile> {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  "last update: ${widget.device.location.date}",
+                  "last update: ${StringFormatter.getTimePassedString(widget.device.location.date)}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)

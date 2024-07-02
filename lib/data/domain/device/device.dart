@@ -87,7 +87,7 @@ class DeviceLocation {
 
   factory DeviceLocation.fromJson(Map<String, dynamic> json) => DeviceLocation(
         location: LatLng(json['latitude'], json['longitude']),
-        date: DateTime.parse(json['date']),
+        date: DateTime.parse(json['date']).toLocal(),
       );
 
   static DeviceLocation defaultLocation =

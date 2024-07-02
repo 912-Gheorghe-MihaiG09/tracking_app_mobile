@@ -54,7 +54,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           ),
           backgroundColor: AppColors.surface,
           body: Padding(
-            padding: const EdgeInsets.all(32).copyWith(top: 0),
+            padding: const EdgeInsets.all(16).copyWith(top: 0),
             child: Column(
               children: [
                 Expanded(

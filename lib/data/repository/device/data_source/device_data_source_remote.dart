@@ -47,4 +47,9 @@ class DeviceDataSourceRemote extends DeviceDataSource {
   FutureOr<void> pingDevice(String serialNumber) {
     return _service.pingDevice(serialNumber);
   }
+
+  @override
+  Future<Stream?> notificationStream() {
+    return _service.connectToDeviceWS();
+  }
 }

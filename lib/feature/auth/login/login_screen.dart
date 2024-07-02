@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       backgroundColor: AppColors.surface,
       body: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Expanded(

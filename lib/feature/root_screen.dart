@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tracking_app/common/network/bloc/network_bloc.dart';
 import 'package:tracking_app/common/theme/colors.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tracking_app/common/widgets/dialogs.dart';
 import 'package:tracking_app/feature/connectivity/add_device_dialog.dart';
+import 'package:tracking_app/feature/home/bloc/device_list_bloc.dart';
 import 'package:tracking_app/feature/home/home_screen.dart';
 import 'package:tracking_app/feature/map/map_screen.dart';
+import 'package:tracking_app/feature/notification/notification_service.dart';
 
 class RootScreen extends StatefulWidget {
   const RootScreen({super.key});
@@ -39,7 +41,8 @@ class _RootScreenState extends State<RootScreen> {
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: _buildNavigationBar(),
-      floatingActionButton: _selectedIndex == 0 ? _buildAddDeviceButton() : null,
+      floatingActionButton:
+          _selectedIndex == 0 ? _buildAddDeviceButton() : null,
     );
   }
 
@@ -84,22 +87,28 @@ class _RootScreenState extends State<RootScreen> {
   }
 
   Widget _buildAddDeviceButton() {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        NetworkBloc networkBloc = BlocProvider.of<NetworkBloc>(context);
-        if (networkBloc.state is NetworkSuccess) {
-          AddDeviceDialog.showDialog(context);
-        } else {
-          GenericDialogs.networkError().showOSDialog(context);
-        }
-      },
-      label: const Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Icon(Icons.add_rounded),
-          Text("Add Device"),
-        ],
-      ),
+    return BlocBuilder<DeviceListBloc, DeviceListState>(
+      builder: (context, state) =>
+          state is DeviceListError || state is DeviceListLoading
+              ? Container()
+              : FloatingActionButton.extended(
+                  onPressed: () async {
+                    NetworkBloc networkBloc =
+                        BlocProvider.of<NetworkBloc>(context);
+                    if (networkBloc.state is NetworkSuccess) {
+                      AddDeviceDialog.showDialog(context);
+                    } else {
+                      GenericDialogs.networkError().showOSDialog(context);
+                    }
+                  },
+                  label: const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Icon(Icons.add_rounded),
+                      Text("Add Device"),
+                    ],
+                  ),
+                ),
     );
   }
 

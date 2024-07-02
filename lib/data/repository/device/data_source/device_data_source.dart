@@ -20,4 +20,6 @@ abstract class DeviceDataSource {
   FutureOr<Device?> unlockDevice(String serialNumber);
 
   FutureOr<void> pingDevice(String serialNumber);
+
+  Future<Stream<dynamic>?> notificationStream();
 }

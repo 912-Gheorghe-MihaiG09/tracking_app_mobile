@@ -14,9 +14,10 @@ class User {
       );
 
   Map<String, String?> toJson() => {
-    "firstName": firstName,
-    "lastName": lastName,
-    "email": email,
-    "password": password,
-  };
+        "role": "ADMIN",
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
+        "password": password,
+      };
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tracking_app/common/theme/colors.dart';
 
 class NativeDialog {
   final String title;
@@ -148,7 +149,9 @@ class NativeDialog {
         const Center(
           child: Padding(
             padding: EdgeInsets.all(16.0),
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
           ),
         ),
       );

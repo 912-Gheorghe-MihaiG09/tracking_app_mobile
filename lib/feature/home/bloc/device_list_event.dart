@@ -7,6 +7,10 @@ abstract class DeviceListEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class FetchDevices extends DeviceListEvent{
+class FetchDevices extends DeviceListEvent {
   const FetchDevices();
+}
+
+class RefreshDevices extends DeviceListEvent {
+  const RefreshDevices();
 }

@@ -14,16 +14,41 @@ class DeviceListBloc extends Bloc<DeviceListEvent, DeviceListState> {
 
   DeviceListBloc(this._deviceRepository) : super(const DeviceListInitial()) {
     on<FetchDevices>(_onFetchDevices);
+    on<RefreshDevices>(_onRefreshDevices);
   }
 
-  FutureOr<void> _onFetchDevices(FetchDevices event, Emitter<DeviceListState> emit) async {
+  FutureOr<void> _onFetchDevices(
+    FetchDevices event,
+    Emitter<DeviceListState> emit,
+  ) async {
     emit(const DeviceListLoading());
-    try{
+    try {
       List<Device> devices = await _deviceRepository.getDevices();
       emit(DeviceListLoaded(devices: devices));
-    } catch(e){
+    } catch (e) {
       log("$runtimeType _onFetchDevices error: ${e.toString()}");
       emit(const DeviceListError());
+    }
+  }
+
+  FutureOr<void> _onRefreshDevices(
+    RefreshDevices event,
+    Emitter<DeviceListState> emit,
+  ) async {
+    if (state is DeviceListLoaded) {
+      emit(
+        DeviceListRefreshing(
+          devices: (state as DeviceListLoaded).devices,
+        ),
+      );
+      try {
+        await Future.delayed(const Duration(seconds: 1));
+        List<Device> devices = await _deviceRepository.getDevices();
+        emit(DeviceListLoaded(devices: devices));
+      } catch (e) {
+        log("$runtimeType _onFetchDevices error: ${e.toString()}");
+        emit(const DeviceListError());
+      }
     }
   }
 }
