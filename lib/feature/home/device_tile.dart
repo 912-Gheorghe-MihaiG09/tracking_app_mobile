@@ -21,6 +21,18 @@ class _DeviceTileState extends State<DeviceTile> {
   @override
   void initState() {
     super.initState();
+    fetchLocationName();
+  }
+
+  @override
+  void didUpdateWidget(covariant DeviceTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.device != widget.device) {
+      fetchLocationName();
+    }
+  }
+
+  void fetchLocationName() {
     placemarkFromCoordinates(widget.device.location.location.latitude,
             widget.device.location.location.longitude)
         .then(
