@@ -5,6 +5,7 @@ import 'package:tracking_app/app_settings.dart';
 import 'package:tracking_app/common/network/bloc/network_bloc.dart';
 import 'package:tracking_app/common/theme/theme_builder.dart';
 import 'package:tracking_app/data/repository/auth/auth_repository.dart';
+import 'package:tracking_app/data/repository/device/data_source/device_data_source_local.dart';
 import 'package:tracking_app/data/repository/device/data_source/device_data_source_remote.dart';
 import 'package:tracking_app/data/repository/device/device_repository.dart';
 import 'package:tracking_app/data/repository/device/device_repository_impl.dart';
@@ -45,10 +46,11 @@ class MyApp extends StatelessWidget {
       AuthInterceptor(_dio, SecureLocalStorage(), _authService, () {});
 
   late final DeviceRepository _deviceRepository = DeviceRepositoryImpl(
-    DeviceDataSourceRemote(
-      DeviceService(_dio, authInterceptor, baseUrl: appSettings.baseUrl),
-    ),
-  );
+      DeviceDataSourceLocal()
+      // DeviceDataSourceRemote(
+      //   DeviceService(_dio, authInterceptor, baseUrl: appSettings.baseUrl),
+      // ),
+      );
 
   late final _authService = AuthService(baseUrl: appSettings.baseUrl);
 

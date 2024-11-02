@@ -18,10 +18,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   FutureOr<void> _onLogIn(LogIn event, Emitter<AuthState> emit) async {
     var user = await authRepository.login(event.email, event.password);
-    if(user != null) {
+    if (user != null) {
       print(user.toString());
       emit(Authenticated(user));
-    } else{
+    } else {
       emit(Unauthenticated());
     }
   }

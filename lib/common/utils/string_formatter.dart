@@ -6,7 +6,7 @@ class StringFormatter {
     now = now ?? DateTime.now();
     Duration difference = now.difference(date);
     if (difference.isNegative) {
-      return "Unknown";
+      return "0s ago";
     }
     int days = difference.inDays;
     if (days >= 365) {

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,8 @@ import 'package:tracking_app/common/widgets/custom_elevated_button.dart';
 import 'package:tracking_app/common/widgets/dialogs.dart';
 import 'package:tracking_app/data/domain/device/device.dart';
 import 'package:tracking_app/data/repository/device/device_repository.dart';
+import 'package:tracking_app/feature/details/bloc/device_details_bloc.dart'
+    as ddb;
 import 'package:tracking_app/feature/details/bloc/device_details_bloc.dart';
 import 'package:tracking_app/feature/details/widgets/details_action_button.dart';
 import 'package:tracking_app/feature/home/bloc/device_list_bloc.dart';
@@ -32,7 +35,7 @@ class DeviceDetailsScreen extends StatefulWidget {
   static MaterialPageRoute route(BuildContext context, Device device) {
     return MaterialPageRoute(builder: (context) {
       return BlocProvider(
-        create: (_) => DeviceDetailsBloc(
+        create: (_) => ddb.DeviceDetailsBloc(
             RepositoryProvider.of<DeviceRepository>(context),
             BlocProvider.of<DeviceListBloc>(context),
             device: device),
@@ -49,24 +52,24 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return UnlockNotifier(
-      child: BlocListener<DeviceDetailsBloc, DeviceDetailsState>(
-        listenWhen: (_, current) => current is PingError,
+      child: BlocListener<ddb.DeviceDetailsBloc, ddb.DeviceDetailsState>(
+        listenWhen: (_, current) => current is ddb.PingError,
         listener: (context, state) {
           GenericDialogs.somethingWentWrong(
             onButtonPress: () =>
-                BlocProvider.of<DeviceDetailsBloc>(context).add(
-              const ResetState(),
+                BlocProvider.of<ddb.DeviceDetailsBloc>(context).add(
+              const ddb.ResetState(),
             ),
           ).showOSDialog(context);
         },
-        child: BlocBuilder<DeviceDetailsBloc, DeviceDetailsState>(
+        child: BlocBuilder<ddb.DeviceDetailsBloc, ddb.DeviceDetailsState>(
           builder: (context, state) => Scaffold(
             extendBodyBehindAppBar: true,
             body: Stack(children: [
               LayoutBuilder(
                 builder: (context, constraints) => SizedBox(
-                  height:
-                      constraints.maxHeight * (state is LockState ? 1 : 0.6),
+                  height: constraints.maxHeight *
+                      (state is ddb.LockState ? 1 : 0.6),
                   child: _DetailsMap(
                     device: state.device,
                     initialPosition: state.device.location.location,
@@ -93,7 +96,7 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
                   ),
                 ),
               ),
-              state is LockState
+              state is ddb.LockState
                   ? _DeviceLockSlider(
                       device: state.device,
                       initialValueInMeters: state.lockRadius,

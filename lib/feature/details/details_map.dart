@@ -58,7 +58,7 @@ class _DetailsMapState extends State<_DetailsMap> {
   Widget build(BuildContext context) {
     return BlocListener<DeviceDetailsBloc, DeviceDetailsState>(
       listener: (context, state) {
-        if (state is LockState) {
+        if (state is ddb.LockState) {
           _circleList.clear();
           _circleList.add(
             Circle(
